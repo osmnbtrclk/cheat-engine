@@ -32,7 +32,7 @@ jobs:
 
     - name: Find and build secondary projects
       run: |
-        $files = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Include *.lpr
+        $files = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Include *.lpr,*.sln
         foreach ($file in $files) {
           if ($file.Extension -eq ".sln") {
             & "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe" $file.FullName
