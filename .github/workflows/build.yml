@@ -20,8 +20,8 @@ jobs:
       run: |
         curl -L -o lazarus.exe https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2064%20bits/Lazarus%202.2.2/lazarus-2.2.2-fpc-3.2.2-win64.exe/download
         curl -L -o lazarus-cross.exe https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2064%20bits/Lazarus%202.2.2/lazarus-2.2.2-fpc-3.2.2-cross-i386-win32-win64.exe/download
-        start /wait lazarus.exe /VERYSILENT
-        start /wait lazarus-cross.exe /VERYSILENT
+        Start-Process -FilePath "lazarus.exe" -ArgumentList "/VERYSILENT" -Wait
+        Start-Process -FilePath "lazarus-cross.exe" -ArgumentList "/VERYSILENT" -Wait
 
     - name: Build Cheat Engine
       run: |
