@@ -25,6 +25,10 @@ jobs:
         $env:Path += ";C:\lazarus\fpc\3.2.2\bin\x86_64-win64"
         $env:Path += ";C:\lazarus\fpc\3.2.2\bin\i386-win32"
 
+    - name: Install Visual Studio Build Tools
+      run: |
+        choco install visualstudio2019buildtools --version=16.11.7 --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended --includeOptional --quiet --wait"
+
     - name: Build Cheat Engine
       working-directory: ${{ github.workspace }}/Cheat Engine
       run: |
