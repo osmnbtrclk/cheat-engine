@@ -22,21 +22,22 @@ jobs:
         curl -L -o lazarus-cross.exe https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2064%20bits/Lazarus%202.2.2/lazarus-2.2.2-fpc-3.2.2-cross-i386-win32-win64.exe/download
         Start-Process -FilePath "lazarus.exe" -ArgumentList "/VERYSILENT" -Wait
         Start-Process -FilePath "lazarus-cross.exe" -ArgumentList "/VERYSILENT" -Wait
+        $env:Path += ";C:\lazarus\fpc\3.2.2\bin\x86_64-win64"
 
     - name: Build Cheat Engine
       run: |
-        & "C:\lazarus\lazbuild.exe" --build-mode=Release cheatengine.lpi
+        & "C:\lazarus\lazbuild.exe" --build-mode=Release "Cheat Engine/cheatengine.lpi"
 
     - name: Build secondary projects
       run: |
-        & "C:\lazarus\lazbuild.exe" --build-mode=Release speedhack.lpr
-        & "C:\lazarus\lazbuild.exe" --build-mode=Release luaclient.lpr
-        & "C:\lazarus\lazbuild.exe" --build-mode=Release DirectXMess.sln
-        & "C:\lazarus\lazbuild.exe" --build-mode=Release DotNetcompiler.sln
-        & "C:\lazarus\lazbuild.exe" --build-mode=Release monodatacollector.sln
-        & "C:\lazarus\lazbuild.exe" --build-mode=Release dotnetdatacollector.sln
-        & "C:\lazarus\lazbuild.exe" --build-mode=Release dotnetinvasivedatacollector.sln
-        & "C:\lazarus\lazbuild.exe" --build-mode=Release cejvmti.sln
-        & "C:\lazarus\lazbuild.exe" --build-mode=Release tcclib.sln
-        & "C:\lazarus\lazbuild.exe" --build-mode=Release vehdebug.lpr
-        & "C:\lazarus\lazbuild.exe" --build-mode=Release dbkkernel.sln
+        & "C:\lazarus\lazbuild.exe" --build-mode=Release "Cheat Engine/speedhack.lpr"
+        & "C:\lazarus\lazbuild.exe" --build-mode=Release "Cheat Engine/luaclient.lpr"
+        & "C:\lazarus\lazbuild.exe" --build-mode=Release "Cheat Engine/DirectXMess.sln"
+        & "C:\lazarus\lazbuild.exe" --build-mode=Release "Cheat Engine/DotNetcompiler.sln"
+        & "C:\lazarus\lazbuild.exe" --build-mode=Release "Cheat Engine/monodatacollector.sln"
+        & "C:\lazarus\lazbuild.exe" --build-mode=Release "Cheat Engine/dotnetdatacollector.sln"
+        & "C:\lazarus\lazbuild.exe" --build-mode=Release "Cheat Engine/dotnetinvasivedatacollector.sln"
+        & "C:\lazarus\lazbuild.exe" --build-mode=Release "Cheat Engine/cejvmti.sln"
+        & "C:\lazarus\lazbuild.exe" --build-mode=Release "Cheat Engine/tcclib.sln"
+        & "C:\lazarus\lazbuild.exe" --build-mode=Release "Cheat Engine/vehdebug.lpr"
+        & "C:\lazarus\lazbuild.exe" --build-mode=Release "Cheat Engine/dbkkernel.sln"
