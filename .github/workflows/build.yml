@@ -1,38 +1,45 @@
-name: Lazarus Build
+name: build-test
 
 on:
-  push:
-    branches:
-      - master
   pull_request:
-    branches:
-      - master
+  push:
+    paths-ignore: [ "README.md" ]
+    branches: [ "master", "releases/*" ]
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-system: [ubuntu-latest, windows-latest, macos-latest]
+        lazarus-versions: ["dist", "stable", "3.4", "2.2.6"]
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+    - name: Checkout source code
+      uses: actions/checkout@v4
 
-    - name: Set up Lazarus
+    - name: Install Lazarus
+      uses: gcarreno/setup-lazarus@master
+      with:
+        lazarus-version: ${{ matrix.lazarus-versions }}
+        include-packages: "Synapse 40.1"
+        with-cache: false
+
+    - name: Install Visual Studio Build Tools (Windows)
+      if: ${{ matrix.operating-system == 'windows-latest' }}
       run: |
-        curl -L -o lazarus.exe https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2064%20bits/Lazarus%202.2.2/lazarus-2.2.2-fpc-3.2.2-win64.exe/download
-        curl -L -o lazarus-cross.exe https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2064%20bits/Lazarus%202.2.2/lazarus-2.2.2-fpc-3.2.2-cross-i386-win32-win64.exe/download
-        Start-Process -FilePath "lazarus.exe" -ArgumentList "/VERYSILENT" -Wait
-        Start-Process -FilePath "lazarus-cross.exe" -ArgumentList "/VERYSILENT" -Wait
-        $env:Path += ";C:\lazarus\fpc\3.2.2\bin\x86_64-win64"
-        $env:Path += ";C:\lazarus\fpc\3.2.2\bin\i386-win32"
+        if (-Not (Test-Path -Path "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe")) {
+          choco install visualstudio2019buildtools --version=16.11.7 --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.Windows10SDK.19041 --includeRecommended --includeOptional --quiet --wait"
+        }
 
-    - name: Install Visual Studio Build Tools
-      run: |
-        choco install visualstudio2019buildtools --version=16.11.7 --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.Windows10SDK.19041 --includeRecommended --includeOptional --quiet --wait"
-
-    - name: Build Cheat Engine
+    - name: Build Cheat Engine (Windows)
+      if: ${{ matrix.operating-system == 'windows-latest' }}
       working-directory: ${{ github.workspace }}/Cheat Engine
       run: |
         & "C:\lazarus\lazbuild.exe" "cheatengine.lpi"
+
+    
 
     - name: Find and build secondary projects
       run: |
@@ -41,7 +48,7 @@ jobs:
           if ($file.Extension -eq ".sln") {
             & "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe" $file.FullName
           } else {
-            & "C:\lazarus\lazbuild.exe" $file.FullName
+            lazbuild -B --bm=Release $file.FullName
           }
         }
 
