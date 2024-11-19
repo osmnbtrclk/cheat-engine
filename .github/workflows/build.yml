@@ -28,4 +28,15 @@ jobs:
     - name: Build Cheat Engine
       working-directory: ${{ github.workspace }}/Cheat Engine
       run: |
-        & "C:\lazarus\lazbuild.exe" --build-mode=Release "cheatengine.lpi"
+        & "C:\lazarus\lazbuild.exe" "cheatengine.lpi"
+
+    - name: Find and build secondary projects
+      run: |
+        $files = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Include *.lpr,*.sln
+        foreach ($file in $files) {
+          if ($file.Extension -eq ".sln") {
+            & "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe" $file.FullName
+          } else {
+            & "C:\lazarus\lazbuild.exe" $file.FullName
+          }
+        }
