@@ -58,3 +58,4 @@ Cheat Engine is a development environment focused on modding games and applicati
      dbkkernel.sln: for kernelmode functions (settings->extra) You will need to build the no-sig version and either boot with unsigned driver support, or sign the driver yourself    
     
 *.SLN files require visual studio (Usually 2017)
+Trigger GitHub Actions workflow
