@@ -44,3 +44,9 @@ jobs:
             & "C:\lazarus\lazbuild.exe" $file.FullName
           }
         }
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: built-artifacts
+        path: ${{ github.workspace }}/Cheat Engine/bin
