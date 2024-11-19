@@ -1,0 +1,42 @@
+name: Lazarus Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Lazarus
+      run: |
+        curl -L -o lazarus.exe https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2064%20bits/Lazarus%202.2.2/lazarus-2.2.2-fpc-3.2.2-win64.exe/download
+        curl -L -o lazarus-cross.exe https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2064%20bits/Lazarus%202.2.2/lazarus-2.2.2-fpc-3.2.2-cross-i386-win32-win64.exe/download
+        start /wait lazarus.exe /VERYSILENT
+        start /wait lazarus-cross.exe /VERYSILENT
+
+    - name: Build Cheat Engine
+      run: |
+        "C:\lazarus\lazbuild.exe" --build-mode=Release cheatengine.lpi
+
+    - name: Build secondary projects
+      run: |
+        "C:\lazarus\lazbuild.exe" --build-mode=Release speedhack.lpr
+        "C:\lazarus\lazbuild.exe" --build-mode=Release luaclient.lpr
+        "C:\lazarus\lazbuild.exe" --build-mode=Release DirectXMess.sln
+        "C:\lazarus\lazbuild.exe" --build-mode=Release DotNetcompiler.sln
+        "C:\lazarus\lazbuild.exe" --build-mode=Release monodatacollector.sln
+        "C:\lazarus\lazbuild.exe" --build-mode=Release dotnetdatacollector.sln
+        "C:\lazarus\lazbuild.exe" --build-mode=Release dotnetinvasivedatacollector.sln
+        "C:\lazarus\lazbuild.exe" --build-mode=Release cejvmti.sln
+        "C:\lazarus\lazbuild.exe" --build-mode=Release tcclib.sln
+        "C:\lazarus\lazbuild.exe" --build-mode=Release vehdebug.lpr
+        "C:\lazarus\lazbuild.exe" --build-mode=Release dbkkernel.sln
