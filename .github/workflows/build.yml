@@ -8,47 +8,40 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.operating-system }}
-    strategy:
-      fail-fast: false
-      matrix:
-        operating-system: [ubuntu-latest, windows-latest, macos-latest]
-        lazarus-versions: ["dist", "stable", "3.4", "2.2.6"]
+    runs-on: windows-latest
 
     steps:
     - name: Checkout source code
       uses: actions/checkout@v4
 
     - name: Install Lazarus
-      uses: gcarreno/setup-lazarus@master
-      with:
-        lazarus-version: ${{ matrix.lazarus-versions }}
-        include-packages: "Synapse 40.1"
-        with-cache: false
+      run: |
+        curl -L -o lazarus.exe https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2064%20bits/Lazarus%202.2.2/lazarus-2.2.2-fpc-3.2.2-win64.exe/download
+        curl -L -o lazarus-cross.exe https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2064%20bits/Lazarus%202.2.2/lazarus-2.2.2-fpc-3.2.2-cross-i386-win32-win64.exe/download
+        Start-Process -FilePath "lazarus.exe" -ArgumentList "/VERYSILENT" -Wait
+        Start-Process -FilePath "lazarus-cross.exe" -ArgumentList "/VERYSILENT" -Wait
+        $env:Path += ";C:\lazarus\fpc\3.2.2\bin\x86_64-win64"
+        $env:Path += ";C:\lazarus\fpc\3.2.2\bin\i386-win32"
 
-    - name: Install Visual Studio Build Tools (Windows)
-      if: ${{ matrix.operating-system == 'windows-latest' }}
+    - name: Install Visual Studio Build Tools
       run: |
         if (-Not (Test-Path -Path "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe")) {
           choco install visualstudio2019buildtools --version=16.11.7 --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.Windows10SDK.19041 --includeRecommended --includeOptional --quiet --wait"
         }
 
-    - name: Build Cheat Engine (Windows)
-      if: ${{ matrix.operating-system == 'windows-latest' }}
+    - name: Build Cheat Engine
       working-directory: ${{ github.workspace }}/Cheat Engine
       run: |
         & "C:\lazarus\lazbuild.exe" "cheatengine.lpi"
 
-    
-
     - name: Find and build secondary projects
       run: |
-        $files = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Include *.lpr,*.sln
+        $files = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Include *.lpr
         foreach ($file in $files) {
           if ($file.Extension -eq ".sln") {
             & "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe" $file.FullName
           } else {
-            lazbuild -B --bm=Release $file.FullName
+            & "C:\lazarus\lazbuild.exe" $file.FullName
           }
         }
 
