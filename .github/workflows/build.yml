@@ -27,7 +27,7 @@ jobs:
 
     - name: Install Visual Studio Build Tools
       run: |
-        choco install visualstudio2019buildtools --version=16.11.7 --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended --includeOptional --quiet --wait"
+        choco install visualstudio2019buildtools --version=16.11.7 --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.Windows10SDK.19041 --includeRecommended --includeOptional --quiet --wait"
 
     - name: Build Cheat Engine
       working-directory: ${{ github.workspace }}/Cheat Engine
